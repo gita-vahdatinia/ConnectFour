@@ -74,7 +74,25 @@ class AIPlayer:
 
 
     def evaluation_function(self, board):
+        utility = []
+        player = self.player_number
+        if (player == 1): 
+            opponent = 2
+        else: 
+            opponent = 1
+        for col in range (0,7): 
+            for row in range(5,0,-1):
+                if boardCopy[row][col] == 0:
+                    board[row][col] = player 
+                    result = count_values(self, board, 4, player) * 1000
+                    result += count_values(self, board, 3, player) * 100
+                    result += count_values(self, board, 2, player) * 10
 
+                    result -= count_values(self, board, 3, opponent) * 100 
+                    result -= count_values(self, board, 2, opponent) * 10
+                    utility.append(result)
+                    board[row][col] = 0
+                    break
         """
         Given the current stat of the board, return the scalar value that 
         represents the evaluation function for the current player
@@ -96,6 +114,44 @@ class AIPlayer:
        
         return 0
 
+def count_values(self, board, num, player_num):
+    numberofwins = 0 
+    player_win_str = '{0}' * num 
+    player_win_str = player_win_str.format(player_num)
+    to_str = lambda a: ''.join(a.astype(str))
+
+    
+
+    def check_horizontal(b):
+        count = 0
+        for row in b:
+            if player_win_str in to_str(row):
+                count += to_str(row).count(player_win_str) 
+        return count
+
+    def check_verticle(b):
+        return check_horizontal(b.T)
+
+
+    def check_diagonal(b):
+        count = 0 
+        for op in [None, np.fliplr]:
+            op_board = op(b) if op else b
+            root_diag = np.diagonal(op_board, offset=0).astype(np.int)
+            if player_win_str in to_str(root_diag):
+                count += to_str(root_diag).count(player_win_str) 
+
+            for i in range(1, b.shape[1]-3):
+                for offset in [i, -i]:
+                    diag = np.diagonal(op_board, offset=offset)
+                    diag = to_str(diag.astype(np.int))
+                    if player_win_str in diag:
+                        count += diag.count(player_win_str) 
+        return count 
+##           return False
+
+    numberofwins = check_horizontal(board) + check_verticle(board) + check_diagonal(board) 
+    print ("number of total wins {}".format(numberofwins)) 
 
 class RandomPlayer:
     def __init__(self, player_number):
@@ -163,17 +219,36 @@ class HumanPlayer:
             if 0 in col:
                 valid_cols.append(i)
 
-        count_values(self, board, 2, 1)
         move = int(input('Enter your move: '))
-
-
-
+        evaluation_function(self,board)
         while move not in valid_cols:
             print('Column full, choose from:{}'.format(valid_cols))
             move = int(input('Enter your move: '))
 
         return move
 
+def evaluation_function(self, board):
+        utility = []
+        player = self.player_number
+        if (player == 1): 
+            opponent = 2
+        else: 
+            opponent = 1
+        for col in range (0,7): 
+            for row in range(5,0,-1):
+                if board[row][col] == 0:
+                    board[row][col] = player 
+                    result = count_values(self, board, 4, player) * 1000
+                    result += count_values(self, board, 3, player) * 100
+                    result += count_values(self, board, 2, player) * 10
+
+                    result -= count_values(self, board, 3, opponent) * 100 
+                    result -= count_values(self, board, 2, opponent) * 10
+                    utility.append(result)
+                    board[row][col] = 0
+
+                    break
+        print (utility)
 def count_values(self, board, num, player_num):
     numberofwins = 0 
     player_win_str = '{0}' * num 
@@ -208,7 +283,5 @@ def count_values(self, board, num, player_num):
                     if player_win_str in diag:
                         count += diag.count(player_win_str) 
         return count 
-##           return False
-
     numberofwins = check_horizontal(board) + check_verticle(board) + check_diagonal(board) 
-    print ("number of total wins {}".format(numberofwins)) 
+    return numberofwins
