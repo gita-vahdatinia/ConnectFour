@@ -220,9 +220,7 @@ class HumanPlayer:
         return move
 
 def count_values(self, board, num, player_num):
-    #a.astype gives array of strings
-    #to_str = lambda a: ''.join(a.astype(str))
-
+    count = 0 
     player_win_str = '{0}' * num 
     player_win_str = player_win_str.format(player_num)
     to_str = lambda a: ''.join(a.astype(str))
@@ -230,30 +228,33 @@ def count_values(self, board, num, player_num):
     
 
     def check_horizontal(b):
+        count = 0
         for row in b:
-            print (to_str(row))
-
             if player_win_str in to_str(row):
-                print ("You have 1 winning ")
-#           return False
+                count += to_str(row).count(player_win_str) 
+        return count
 
     def check_verticle(b):
         return check_horizontal(b.T)
 
+
     def check_diagonal(b):
+        count = 0 
         for op in [None, np.fliplr]:
             op_board = op(b) if op else b
             root_diag = np.diagonal(op_board, offset=0).astype(np.int)
             if player_win_str in to_str(root_diag):
-                print ("You have a diag")
+                count += to_str(root_diag).count(player_win_str) 
 
-                for i in range(1, b.shape[1]-3):
-                    for offset in [i, -i]:
-                        diag = np.diagonal(op_board, offset=offset)
-                        diag = to_str(diag.astype(np.int))
-                        if player_win_str in diag:
-                            print ("you have a diag")
-#           return False
-    check_horizontal(board) 
-    check_verticle(board) 
-    check_diagonal(board)
+            for i in range(1, b.shape[1]-3):
+                for offset in [i, -i]:
+                    diag = np.diagonal(op_board, offset=offset)
+                    diag = to_str(diag.astype(np.int))
+                    if player_win_str in diag:
+                        count += diag.count(player_win_str) 
+        return count 
+##           return False
+
+    print ("number of check horiz {}".format(check_horizontal(board))) 
+    print ("number of check verti {}".format(check_verticle(board))) 
+    print ("number of check diag {}".format(check_diagonal(board))) 
