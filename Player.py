@@ -27,9 +27,10 @@ class AIPlayer:
 
     def get_alpha_beta_move(self, board):
         utility = evaluation_function(self,board)
-        max_value = max(utility)
+        max_value = min(utility)
         max_index = utility.index(max_value)
-        return max_index
+#        return max_index
+        return (evaluation_function(self,board))
         """
         Given the current state of the board, return the next move based on
         the alpha-beta pruning algorithm
@@ -76,30 +77,6 @@ class AIPlayer:
         raise NotImplementedError('Whoops I don\'t know what to do')
 
 
-
-def evaluation_function(self, board):
-        utility = []
-        player = self.player_number
-        if (player == 1): 
-            opponent = 2
-        else: 
-            opponent = 1
-        for col in range (0,7): 
-            for row in range(5,0,-1):
-                if board[row][col] == 0:
-                    board[row][col] = player 
-                    result = count_values(self, board, 4, player) * 1000
-                    result += count_values(self, board, 3, player) * 100
-                    result += count_values(self, board, 2, player) * 10
-
-                    result -= count_values(self, board, 3, opponent) * 100 
-                    result -= count_values(self, board, 2, opponent) * 10
-                    utility.append(result)
-                    board[row][col] = 0
-
-                    break
-        return (utility)
-
 def count_values(self, board, num, player_num):
     numberofwins = 0 
     player_win_str = '{0}' * num 
@@ -133,6 +110,81 @@ def count_values(self, board, num, player_num):
         return count 
     numberofwins = check_horizontal(board) + check_verticle(board) + check_diagonal(board) 
     return numberofwins
+
+def min_utility(self, board, col, opponent, player):
+    utility = []
+    for row in range(5,0,-1):
+        if board[row][col] == 0:
+            board[row][col] = player
+            result = count_values(self, board, 4, player) * 1000
+            result += count_values(self, board, 3, player) * 100
+            result += count_values(self, board, 2, player) * 10
+
+            result -= count_values(self, board, 3, opponent) * 1000 
+            result -= count_values(self, board, 2, opponent) * 10
+            utility.append(result)
+#                    utility = min_function(self, board)
+            board[row][col] = 0
+
+            break
+    max_value = min(utility)
+    max_index = utility.index(max_value)
+    return max_index
+            
+def evaluation_function(self, board):
+    utility = []
+    player = self.player_number
+    if (player == 1): 
+        opponent = 2
+    else: 
+        opponent = 1
+    for col in range (0,7): 
+        for row in range(5,0,-1):
+            if board[row][col] == 0:
+                board[row][col] = player 
+                result = count_values(self, board, 4, player) * 1000
+                result += count_values(self, board, 3, player) * 100
+                result += count_values(self, board, 2, player) * 10
+
+                result -= count_values(self, board, 3, opponent) * 1000 
+                result -= count_values(self, board, 2, opponent) * 10
+                utility.append(result)
+#                    utility = min_function(self, board)
+                board[row][col] = 0
+
+                break
+    max_value = max(utility)
+    max_index = utility.index(max_value)
+    return (min_utility(self,board, max_index, player, opponent)) 
+#        return (utility)
+
+
+                
+        
+    def min_function(self, board):
+        utility = []
+        opponent = self.player_number
+        if (opponent == 1): 
+            player = 2
+        else: 
+            player = 1
+        for col in range (0,7): 
+            for row in range(5,0,-1):
+                if board[row][col] == 0:
+                    board[row][col] = player 
+                    result = count_values(self, board, 4, player) * 1000
+                    result += count_values(self, board, 3, player) * 100
+                    result += count_values(self, board, 2, player) * 10
+
+                    result -= count_values(self, board, 3, opponent) * 1000 
+                    result -= count_values(self, board, 2, opponent) * 10
+                    utility.append(result)
+#                    evaluation_function(self, board)
+                    board[row][col] = 0
+                    break
+        return (utility)
+
+
 
 
 class RandomPlayer:
