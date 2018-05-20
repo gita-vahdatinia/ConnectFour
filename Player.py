@@ -220,7 +220,7 @@ class HumanPlayer:
         return move
 
 def count_values(self, board, num, player_num):
-    count = 0 
+    numberofwins = 0 
     player_win_str = '{0}' * num 
     player_win_str = player_win_str.format(player_num)
     to_str = lambda a: ''.join(a.astype(str))
@@ -255,6 +255,5 @@ def count_values(self, board, num, player_num):
         return count 
 ##           return False
 
-    print ("number of check horiz {}".format(check_horizontal(board))) 
-    print ("number of check verti {}".format(check_verticle(board))) 
-    print ("number of check diag {}".format(check_diagonal(board))) 
+    numberofwins = check_horizontal(board) + check_verticle(board) + check_diagonal(board) 
+    print ("number of total wins {}".format(numberofwins)) 
