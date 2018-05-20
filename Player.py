@@ -46,52 +46,6 @@ class AIPlayer:
         The 0 based index of the column that represents the next move
         """
         raise NotImplementedError('Whoops I don\'t know what to do')
-    
-
-    def count_spots(self, board, n, player_num):
-
-        if(player_num == 1):
-            for _ in n:
-                player_win_str += '{1}'
-        else:
-            for _ in n:
-                player_win_str += '{2}'
-            
-        to_str = lambda a: ''.join(a.astype(str))
-
-        def check_horizontal(b):
-            for row in b:
-                if player_win_str in to_str(row):
-                    return True
-            return False
-
-        def check_verticle(b):
-            return check_horizontal(b.T)
-
-        def check_diagonal(b):
-            for op in [None, np.fliplr]:
-                op_board = op(b) if op else b
-
-                root_diag = np.diagonal(op_board, offset=0).astype(np.int)
-                if player_win_str in to_str(root_diag):
-                    return True
-
-                for i in range(1, b.shape[1]-3):
-                    for offset in [i, -i]:
-                        diag = np.diagonal(op_board, offset=offset)
-                        diag = to_str(diag.astype(np.int))
-                        if player_win_str in diag:
-                            return True
-
-            return False
-
-        return (check_horizontal(board) or
-                check_verticle(board) or
-                check_diagonal(board))
-
-
-                    
-
    
     def get_expectimax_move(self, board):
         """
@@ -120,6 +74,7 @@ class AIPlayer:
 
 
     def evaluation_function(self, board):
+
         """
         Given the current stat of the board, return the scalar value that 
         represents the evaluation function for the current player
@@ -208,15 +163,15 @@ class HumanPlayer:
             if 0 in col:
                 valid_cols.append(i)
 
+        count_values(self, board, 2, 1)
         move = int(input('Enter your move: '))
+
 
 
         while move not in valid_cols:
             print('Column full, choose from:{}'.format(valid_cols))
             move = int(input('Enter your move: '))
-        n = 2
-        player_num = 1
-        count_values(self, board, 2, 1)
+
         return move
 
 def count_values(self, board, num, player_num):
