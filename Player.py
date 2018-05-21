@@ -78,6 +78,7 @@ class AIPlayer:
 
 
 def evaluation_function(self, board):
+        moves = []
         utility = []
         player = self.player_number
         if (player == 1): 
@@ -87,6 +88,7 @@ def evaluation_function(self, board):
         for col in range (0,7): 
             for row in range(5,0,-1):
                 if board[row][col] == 0:
+                    moves. append([row,col])
                     board[row][col] = player 
                     result = count_values(self, board, 4, player) * 1000
                     result += count_values(self, board, 3, player) * 100
@@ -98,6 +100,7 @@ def evaluation_function(self, board):
                     board[row][col] = 0
 
                     break
+        print (moves)
         return (utility)
 
 def count_values(self, board, num, player_num):
