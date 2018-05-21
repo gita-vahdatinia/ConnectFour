@@ -62,9 +62,9 @@ class AIPlayer:
         result += self.count_values( board, 3, player) * 100
         result += self.count_values( board, 2, player) * 10
 
-        result -= self.count_values( board, 4, opponent) * 500 
-        result -= self.count_values( board, 3, opponent) * 100 
-        result -= self.count_values( board, 2, opponent) * 10
+        result += self.count_values( board, 4, opponent) * 500 
+        result += self.count_values( board, 3, opponent) * 100 
+        result += self.count_values( board, 2, opponent) * 10
 
         return (result)
 
@@ -75,7 +75,7 @@ class AIPlayer:
             v = -100000
             for row, col in self.validMoves(board):
                 board[row][col] = player
-                v = max(v, max_value(board,alpha, beta,depth, player, opponent))
+                v = max(v, min_value(board,alpha, beta,depth, player, opponent))
                 values.append(v)
                 board[row][col] = 0
             maxvalue = max(values)
@@ -90,6 +90,8 @@ class AIPlayer:
             for row,col in valid_moves:
                 board[row][col] = opponent 
                 result = max_value(board, alpha, beta, depth-1, player, opponent)
+                print("min board")
+                print(board)
                 v = min (v, result)
                 board[row][col] = 0
                 if v<= alpha:
@@ -103,6 +105,8 @@ class AIPlayer:
             v = -10000000
             for row, col in valid_moves:
                 board[row][col] = player 
+                print("max board")
+                print(board)
                 result = min_value(board,alpha,beta,depth-1, player, opponent)
                 v = max(v, result)
                 board[row][col] = 0
@@ -116,7 +120,7 @@ class AIPlayer:
             opponent = 2
         else: 
             opponent = 1
-        return (alphabeta(board, 3, -100000,+100000, player, opponent)) 
+        return (alphabeta(board, 2, -100000,+100000, player, opponent)) 
         raise NotImplementedError('Whoops I don\'t know what to do')
 #    def get_alpha_beta_move(self, board):
 #        player = self.player_number
