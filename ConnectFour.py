@@ -57,11 +57,14 @@ class Game:
                     recv_end, send_end = mp.Pipe(False)
                     p = mp.Process(target=turn_worker, args=(self.board, send_end, p_func))
                     p.start()
-                    p.join(self.ai_turn_limit)
+                    if p.join(self.ai_turn_limit) is None and p.is_alive():
+                        p.terminate()
+                        raise Exception('Player Exceeded time limit')
                 except Exception as e:
                     uh_oh = 'Uh oh.... something is wrong with Player {}'
                     print(uh_oh.format(current_player.player_number))
-                    print(e.with_traceback())
+                    print(e)
+                    raise Exception('Game Over')
 
                 move = recv_end.recv()
             else:
@@ -69,8 +72,6 @@ class Game:
 
             if move is not None:
                 self.update_board(int(move), current_player.player_number)
-            else:
-                raise Exception('Player exceeded time limit')
 
             if self.game_completed(current_player.player_number):
                 self.game_over = True
@@ -140,7 +141,6 @@ def main(player1, player2, time):
     """
     Creates player objects based on the string paramters that are passed
     to it and calls play_game()
-
     INPUTS:
     player1 - a string ['ai', 'random', 'human']
     player2 - a string ['ai', 'random', 'human']
@@ -159,11 +159,9 @@ def main(player1, player2, time):
 def play_game(player1, player2):
     """
     Creates a new game GUI and plays a game using the two players passed in.
-
     INPUTS:
     - player1 an object of type AIPlayer, RandomPlayer, or HumanPlayer
     - player2 an object of type AIPlayer, RandomPlayer, or HumanPlayer
-
     RETURNS:
     None
     """

@@ -7,48 +7,12 @@ class AIPlayer:
         self.type = 'ai'
         self.player_string = 'Player {}:ai'.format(player_number)
 
-    def get_state(self):
-        file_name = 'state.json'
-        # first run
-        if file_name not in os.listdir():
-            with open(file_name, 'w') as f:
-                json.dump(self.state, f)
-        # we have state
-        else:
-            with open(file_name, 'r') as f:
-                self.state = json.load(f)
-
-    def save_state(self):
-        file_name = 'state.json'
-        self.state['turn'] += 1
-        with open(file_name, 'w') as f:
-            json.dump(self.state, f)
-
 
     def get_alpha_beta_move(self, board):
-        utility = evaluation_function(self,board)
-        max_value = max(utility)
-        max_index = utility.index(max_value)
-        return max_index
-        """
-        Given the current state of the board, return the next move based on
-        the alpha-beta pruning algorithm
-
-        This will play against either itself or a human player
-
-        INPUTS:
-        board - a numpy array containing the state of the board using the
-                following encoding:
-                - the board maintains its same two dimensions
-                    - row 0 is the top of the board and so is
-                      the last row filled
-                - spaces that are unoccupied are marked as 0
-                - spaces that are occupied by player 1 have a 1 in them
-                - spaces that are occupied by player 2 have a 2 in them
-
-        RETURNS:
-        The 0 based index of the column that represents the next move
-        """
+        #utility = evaluation_function(self,board)
+        #max_value = max(utility)
+        #max_index = utility.index(max_value)
+        return iterDeepening(self, board) 
         raise NotImplementedError('Whoops I don\'t know what to do')
    
     def get_expectimax_move(self, board):
@@ -75,30 +39,30 @@ class AIPlayer:
         """
         raise NotImplementedError('Whoops I don\'t know what to do')
 
-
-
 def evaluation_function(self, board):
-        utility = []
+        result = 0
         player = self.player_number
         if (player == 1): 
             opponent = 2
         else: 
             opponent = 1
-        for col in range (0,7): 
-            for row in range(5,0,-1):
-                if board[row][col] == 0:
-                    board[row][col] = player 
-                    result = count_values(self, board, 4, player) * 1000
-                    result += count_values(self, board, 3, player) * 100
-                    result += count_values(self, board, 2, player) * 10
+        result = count_values(self, board, 4, player) * 1000
+        result += count_values(self, board, 3, player) * 100
+        result += count_values(self, board, 2, player) * 10
 
-                    result -= count_values(self, board, 3, opponent) * 100 
-                    result -= count_values(self, board, 2, opponent) * 10
-                    utility.append(result)
-                    board[row][col] = 0
+        result += count_values(self, board, 3, opponent) * 700 
+        result += count_values(self, board, 2, opponent) * 10
 
-                    break
-        return (utility)
+        return (result)
+
+def validMoves(board):
+    moves = []
+    for col in range(7):
+        for row in range(5,0,-1):
+            if board[row][col] == 0:
+                moves.append([row, col])
+                break
+    return moves
 
 def count_values(self, board, num, player_num):
     numberofwins = 0 
@@ -134,6 +98,54 @@ def count_values(self, board, num, player_num):
     numberofwins = check_horizontal(board) + check_verticle(board) + check_diagonal(board) 
     return numberofwins
 
+def abpruning(self, board, depth):
+    player = self.player_number
+
+    def ab(self, board, depth, alpha, beta):
+        values = [];
+        v = -100000000
+        for a,s in validMoves(board):
+            board[a][s] = 1
+            v = max(v, abmin(self, board, depth-1, alpha, beta))
+            values.append(v)
+            board[a][s]=0
+        largest = max(values)
+        dex = values.index(largest)
+        return [dex, largest]
+
+    def abmax(self, board, depth, alpha, beta):
+        moves = validMoves(board)
+        if (depth==0 or not moves):
+            return evaluation_function(self, board)
+
+        v=-1000000
+        for a,s in moves:
+            board[a][s]=1
+            v=max(v, abmin(self, board, depth-1, alpha,beta))
+            board[a][s] = 0
+            if v >= beta: return v
+            alpha = max(alpha, v)
+        return v
+
+    def abmin(self,board, depth, alpha, beta):
+        moves=validMoves(board)
+        if(depth==0 or not moves):
+            return evaluation_function(self, board)
+
+        v=+1000000
+        for a,s in moves:
+            board[a][s]=2
+            v=min(v, abmax(self, board, depth-1, alpha, beta))
+            board[a][s]=0
+            if v<= alpha: return v
+            beta=min(beta,v)
+        return v
+    return ab(self,board, depth, -1000000, +1000000)
+
+def iterDeepening(self, board):
+    depth = 5
+    res = abpruning(self, board, depth)
+    return res[0]
 
 class RandomPlayer:
     def __init__(self, player_number):
@@ -173,10 +185,6 @@ class HumanPlayer:
         self.type = 'human'
         self.player_string = 'Player {}:human'.format(player_number)
 
-
-
-
-
     def get_move(self, board):
 
         """
@@ -207,5 +215,3 @@ class HumanPlayer:
             move = int(input('Enter your move: '))
 
         return move
-
-
