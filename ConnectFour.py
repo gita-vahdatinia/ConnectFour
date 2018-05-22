@@ -17,7 +17,7 @@ def turn_worker(board, send_end, p_func):
 class Game:
     def __init__(self, player1, player2, time):
         self.players = [player1, player2]
-        self.colors = ['pink', 'green']
+        self.colors = ['yellow', 'red']
         self.current_turn = 0
         self.board = np.zeros([6,7]).astype(np.uint8)
         self.gui_board = []

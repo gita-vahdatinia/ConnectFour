@@ -1,3 +1,4 @@
+#Guita Vahdatinia
 import numpy as np
 from operator import itemgetter
 
@@ -59,11 +60,11 @@ class AIPlayer:
             opponent = 2
         else: 
             opponent = 1
-        result = self.count_values( board, 4, player) * 1300
+        result = self.count_values( board, 4, player) * 1000
         result += self.count_values( board, 3, player) * 100
         result += self.count_values( board, 2, player) * 10
 
-        result -= self.count_values( board, 4, opponent) * 1300 
+        result -= self.count_values( board, 4, opponent) * 950 
         result -= self.count_values( board, 3, opponent) * 100 
         result -= self.count_values( board, 2, opponent) * 10
 
@@ -74,12 +75,10 @@ class AIPlayer:
     
         def alphabeta( board, depth, alpha, beta, player, opponent):
             for row, col in self.validMoves(board):
-                print (self.validMoves(board))
                 board[row][col] = player
                 alpha = max(alpha, min_value(board,alpha, beta,depth + 1 , player, opponent))
                 values.append((alpha,col))
                 board[row][col] = 0
-            print (values)
             maxvalue = (max(values,key=itemgetter(1))[0]) 
             for item in values:
                 if maxvalue in item:
@@ -122,31 +121,58 @@ class AIPlayer:
         raise NotImplementedError('Whoops I don\'t know what to do')
 
 
-#   
-#    def get_expectimax_move(self, board):
-#
-#        """
-#        Given the current state of the board, return the next move based on
-#        the expectimax algorithm.
-#
-#        This will play against the random player, who chooses any valid move
-#        with equal probability
-#
-#        INPUTS:
-#        board - a numpy array containing the state of the board using the
-#                following encoding:
-#                - the board maintains its same two dimensions
-#                    - row 0 is the top of the board and so is
-#                      the last row filled
-#                - spaces that are unoccupied are marked as 0
-#                - spaces that are occupied by player 1 have a 1 in them
-#                - spaces that are occupied by player 2 have a 2 in them
-#
-#        RETURNS:
-#        The 0 based index of the column that represents the next move
-#        """
-#        raise NotImplementedError('Whoops I don\'t know what to do')
-#
+   
+    def get_expectimax_move(self, board):
+        values = []
+        def expectimax(board, depth, player, opponent):
+            alpha = - 1000000
+            for row, col in self.validMoves(board):
+                board[row][col] = player
+                alpha = max(alpha, exp_val(board,depth - 1 , player, opponent))
+                values.append((alpha,col))
+                board[row][col] = 0
+
+            maxvalue = (max(values,key=itemgetter(1))[0]) 
+            for item in values:
+                if maxvalue in item:
+                    maxindex = item[1]
+                    break
+
+            return (maxindex)
+        def max_val(board, depth, player,opponent):
+            valid_moves = self.validMoves(board)
+            if (depth == 0 or not valid_moves): 
+                return (self.evaluation_function(board))
+            bestValue = -100000
+            for row,col in valid_moves:
+                board[row][col] = player 
+                val = exp_val(board, depth - 1, player, opponent)
+                bestValue = max(bestValue, val);
+            return bestValue
+        def exp_val(board, depth, player, opponent): 
+            valid_moves = self.validMoves(board)
+            lengthmoves = len(valid_moves)
+            print (lengthmoves)
+            if (depth == 0 or not valid_moves): 
+                return (self.evaluation_function(board))
+            expectedValue = 0
+            for row,col in valid_moves:
+                board[row][col] = opponent 
+                val = max_val(board , depth-1, player, opponent)
+                expectedValue += val
+
+
+            return (expectedValue/lengthmoves)
+
+        player = self.player_number
+        if (player == 1): 
+            opponent = 2
+        else: 
+            opponent = 1
+        return (expectimax(board, 8 , player, opponent))
+
+        raise NotImplementedError('Whoops I don\'t know what to do')
+
 
 class RandomPlayer:
     def __init__(self, player_number):
