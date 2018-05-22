@@ -1,4 +1,5 @@
 import numpy as np
+from operator import itemgetter
 
 wins = 0        
 class AIPlayer:
@@ -11,7 +12,7 @@ class AIPlayer:
     def validMoves(self, board):
         moves = []
         for col in range(7):
-            for row in range(5,0,-1):
+            for row in range(5,-1,-1):
                 if board[row][col] == 0:
                     moves.append([row, col])
                     break
@@ -58,11 +59,11 @@ class AIPlayer:
             opponent = 2
         else: 
             opponent = 1
-        result = self.count_values( board, 4, player) * 1000
+        result = self.count_values( board, 4, player) * 1300
         result += self.count_values( board, 3, player) * 100
         result += self.count_values( board, 2, player) * 10
 
-        result -= self.count_values( board, 4, opponent) * 500 
+        result -= self.count_values( board, 4, opponent) * 1300 
         result -= self.count_values( board, 3, opponent) * 100 
         result -= self.count_values( board, 2, opponent) * 10
 
@@ -73,22 +74,27 @@ class AIPlayer:
     
         def alphabeta( board, depth, alpha, beta, player, opponent):
             for row, col in self.validMoves(board):
+                print (self.validMoves(board))
                 board[row][col] = player
-                alpha = max(alpha, min_value(board,alpha, beta,depth - 1 , player, opponent))
-                values.append(alpha)
-                print (values)
+                alpha = max(alpha, min_value(board,alpha, beta,depth + 1 , player, opponent))
+                values.append((alpha,col))
                 board[row][col] = 0
-            maxvalue = max(values)
-            maxindex = values.index(maxvalue)
-            return maxindex
+            print (values)
+            maxvalue = (max(values,key=itemgetter(1))[0]) 
+            for item in values:
+                if maxvalue in item:
+                    maxindex = item[1]
+                    break
+
+            return (maxindex)
 
         def min_value(board,alpha,beta,depth,player, opponent):
             valid_moves = self.validMoves(board)
-            if(depth == 0 or not valid_moves):
+            if(depth == 4 or not valid_moves):
                 return (self.evaluation_function(board))
             for row,col in valid_moves:
                 board[row][col] = opponent 
-                result = max_value(board, alpha, beta, depth-1, player, opponent)
+                result = max_value(board, alpha, beta, depth+1, player, opponent)
                 beta = min (beta, result)
                 board[row][col] = 0
                 if beta<= alpha:
@@ -96,13 +102,11 @@ class AIPlayer:
             return beta
         def max_value(board,alpha, beta, depth, player, opponent):
             valid_moves = self.validMoves(board)
-            if(depth == 0 or not valid_moves):
+            if(depth == 4 or not valid_moves):
                 return (self.evaluation_function(board))
             for row, col in valid_moves:
                 board[row][col] = player 
-                print("max board")
-                print(board)
-                result = min_value(board,alpha,beta,depth-1, player, opponent)
+                result = min_value(board,alpha,beta,depth+1, player, opponent)
                 alpha = max(alpha, result)
                 board[row][col] = 0
                 if alpha >= beta:
@@ -114,25 +118,8 @@ class AIPlayer:
             opponent = 2
         else: 
             opponent = 1
-        return (alphabeta(board, 4, -100000,+100000, player, opponent)) 
+        return (alphabeta(board, 0, -100000,+100000, player, opponent)) 
         raise NotImplementedError('Whoops I don\'t know what to do')
-#    def get_alpha_beta_move(self, board):
-#        player = self.player_number
-#        if (player == 1): 
-#            opponent = 2
-#        else: 
-#            opponent = 1
-#        v = self.max_value(board, -100000, +100000, 3)
-#
-#        def max_value(self, board, alpha, beta, depth):
-#            if (depth == d or terminal_test()): return utility()
-#            for moves in validMoves(board):
-#                v = max(v, self.min_value(board3, alpha, beta, depth+1))
-#        def min_value(board, alpha, beta, depth):
-#            if (depth == d or terminal_test()): return utility()
-#                for moves in validMoves(board):
-#                    v = min(v, self.max_value(board4, alpha, beta, depth+1))
-#
 
 
 #   
@@ -160,57 +147,6 @@ class AIPlayer:
 #        """
 #        raise NotImplementedError('Whoops I don\'t know what to do')
 #
-
-#
-#
-#def abpruning(self, board, depth):
-#    player = self.player_number
-#
-#    def ab(self, board, depth, alpha, beta):
-#        values = [];
-#        v = -100000000
-#        for a,s in validMoves(board):
-#            board[a][s] = 1
-#            v = max(v, abmin(self, board, depth-1, alpha, beta))
-#            values.append(v)
-#            board[a][s]=0
-#        largest = max(values)
-#        dex = values.index(largest)
-#        return [dex, largest]
-#
-#    def abmax(self, board, depth, alpha, beta):
-#        moves = validMoves(board)
-#        if (depth==0 or not moves):
-#            return evaluation_function(self, board)
-#
-#        v=-1000000
-#        for a,s in moves:
-#            board[a][s]=1
-#            v=max(v, abmin(self, board, depth-1, alpha,beta))
-#            board[a][s] = 0
-#            if v >= beta: return v
-#            alpha = max(alpha, v)
-#        return v
-#
-#    def abmin(self,board, depth, alpha, beta):
-#        moves=validMoves(board)
-#        if(depth==0 or not moves):
-#            return evaluation_function(self, board)
-#
-#        v=+1000000
-#        for a,s in moves:
-#            board[a][s]=2
-#            v=min(v, abmax(self, board, depth-1, alpha, beta))
-#            board[a][s]=0
-#            if v<= alpha: return v
-#            beta=min(beta,v)
-#        return v
-#    return ab(self,board, depth, -1000000, +1000000)
-#
-#def iterDeepening(self, board):
-#    depth = 5
-#    res = abpruning(self, board, depth)
-#    return res[0]
 
 class RandomPlayer:
     def __init__(self, player_number):
